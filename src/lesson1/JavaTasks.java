@@ -197,6 +197,10 @@ public class JavaTasks {
      * 2
      * 2
      */
+    /*
+    время: O(N*logN)
+    память: S(N)
+    */
     static public void sortSequence(String inputName, String outputName) throws IOException {
         int cnt = 1;
         int maxCount  = -1;
@@ -228,7 +232,6 @@ public class JavaTasks {
                 cnt++;
             }
         }
-        //List<Integer> sortedSet = new ArrayList(minDigit);
         Collections.sort(minDigit);
         minNumber = minDigit.get(0);
         for (int i = 0; i < list.size(); i++) {
