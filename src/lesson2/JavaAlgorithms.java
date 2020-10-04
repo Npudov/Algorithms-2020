@@ -3,6 +3,11 @@ package lesson2;
 import kotlin.NotImplementedError;
 import kotlin.Pair;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.lang.Math.max;
+
 @SuppressWarnings("unused")
 public class JavaAlgorithms {
     /**
@@ -97,9 +102,75 @@ public class JavaAlgorithms {
      * Если имеется несколько самых длинных общих подстрок одной длины,
      * вернуть ту из них, которая встречается раньше в строке first.
      */
-    static public String longestCommonSubstring(String firs, String second) {
-        throw new NotImplementedError();
+    /*
+    время: O(x.length() * y.length()) x и y - соответсвующие строки
+    память: S(x.length() * y.length())
+     */
+    // Алгоритм Нидлмана-Вунша (описание из википедии)
+    static public String longestCommonSubstring(String first, String second) {
+        if (first == null || second == null || first.length() == 0 || second.length() == 0) {
+            return "";
+        }
+        if (first.equals(second)) {
+            return first;
+        }
+        int[][] matrix = new int[first.length() + 1][second.length() + 1];
+        char[] x = first.toCharArray();
+        char[] y = second.toCharArray();
+        int maxSubstringLength = 0;
+        int maxIndex = 0;
+        for (int i = 0; i < x.length; i++) {
+            //matrix[i] = new int[second.length()];
+            for (int j = 0; j < y.length; j++) {
+                if (x[i] == y[j]) {
+                    matrix[i + 1][j + 1] = matrix[i][j] + 1;
+                    if (matrix[i + 1][j + 1] > maxSubstringLength) {
+                        maxSubstringLength = matrix[i + 1][j + 1];
+                        maxIndex = i + 1;
+                    }
+                }
+            }
+        }
+        return first.substring((maxIndex - 1) - maxSubstringLength + 1, (maxIndex - 1) + 1);
     }
+        /*if (first == null || second == null || first.length() == 0 || second.length() == 0) return "";
+        if (first.equals(second)) return first;
+        char[] x = first.toCharArray();
+        char[] y = second.toCharArray();
+        List<Character> maxSubstring = new ArrayList<>();
+        int[][] matrix = new int[first.length() + 1][second.length() + 1];
+        for (int indexFirst = 0; indexFirst < first.length(); indexFirst++) {
+            for (int indexSecond = 0; indexSecond < second.length(); indexSecond++) {
+                if (x[indexFirst] == y[indexSecond]) {
+                    matrix[indexFirst + 1][indexSecond + 1] = matrix[indexFirst][indexSecond] + 1;
+                }
+                else {
+                    matrix[indexFirst + 1][indexSecond + 1] = max(matrix[indexFirst][indexSecond + 1], matrix[indexFirst + 1][indexSecond]);
+                }
+            }
+        }
+        int indexX = first.length() - 1;
+        int indexY = second.length() - 1;
+        while (indexX >= 0 && indexY >= 0) {
+            if (x[indexX] == y[indexY]) {
+                maxSubstring.add(x[indexX]);
+                indexX--;
+                indexY--;
+            }
+            else if (matrix[indexX][indexY + 1] > matrix[indexX + 1][indexY]) {
+                indexX--;
+            }
+            else {
+                indexY--;
+            }
+        }
+        StringBuilder result = new StringBuilder();
+        if (maxSubstring.isEmpty()) return "";
+        for (int i = maxSubstring.size() - 1; i >= 0; i--) {
+            result.append(maxSubstring.get(i));
+        }
+        return result.toString();
+    }*/
 
     /**
      * Число простых чисел в интервале
@@ -112,6 +183,24 @@ public class JavaAlgorithms {
      * Единица простым числом не считается.
      */
     static public int calcPrimesNumber(int limit) {
-        throw new NotImplementedError();
+        if (limit <= 1) return 0;
+        int cnt = 0;
+        int num = 1;
+        while (num <= limit) {
+            if (isPrime(num)) cnt++;
+            num++;
+        }
+        return cnt;
+    }
+    private static boolean isPrime(int num) {
+        if (num < 2) return false;
+        if (num == 2) return true;
+        int i = 2;
+        int lim = (int) Math.sqrt(num);
+        while (i <= lim) {
+            if (num % i == 0) return false;
+            i++;
+        }
+        return true;
     }
 }
