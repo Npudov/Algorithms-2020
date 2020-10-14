@@ -101,8 +101,42 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
      */
     @Override
     public boolean remove(Object o) {
-        // TODO
-        throw new NotImplementedError();
+        if (!contains(o)) return false; // если элемента нет в множестве
+        T t = (T) o;
+        root = delete(root, t);
+        size--;
+        return true;
+    }
+
+    private Node<T> delete(Node<T> start, T value) {
+        if (start == null) return null;
+        int comparison = value.compareTo(start.value);
+        if (comparison == 0) {
+            if (start.left == null && start.right == null) return null; // у узла нет дочерних элементов
+
+            if (start.left == null) return start.right; // у узла один дочерний элемент
+            if (start.right == null) return start.left;
+
+            // у узла два дочерних элемента
+            Node<T> left = start.left;
+            Node<T> right = start.right;
+            start = maximumValue(start.left);
+            start.right = right;
+            start.left = delete(left, start.value);
+            return start;
+        }
+        if (comparison > 0) {
+            start.right = delete(start.right, value);
+            return start;
+        }
+        else {
+            start.left = delete(start.left, value);
+            return start;
+        }
+    }
+
+    private Node<T> maximumValue(Node<T> node) {
+        return node.right == null ? new Node<>(node.value) : maximumValue(node.right);
     }
 
     @Nullable
@@ -120,6 +154,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
     public class BinarySearchTreeIterator implements Iterator<T> {
 
         private BinarySearchTreeIterator() {
+            int currentIndex = 0;
             // Добавьте сюда инициализацию, если она необходима.
         }
 
@@ -135,7 +170,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
          */
         @Override
         public boolean hasNext() {
-            // TODO
+            //return
             throw new NotImplementedError();
         }
 

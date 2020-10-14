@@ -182,6 +182,10 @@ public class JavaAlgorithms {
      * Справка: простым считается число, которое делится нацело только на 1 и на себя.
      * Единица простым числом не считается.
      */
+    /*
+    время: O(limit * sqrt(N)) , где N- число, до которого мы ищем все простые числа
+    память: S(N)
+     */
     static public int calcPrimesNumber(int limit) {
         if (limit <= 1) return 0;
         int cnt = 0;
