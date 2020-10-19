@@ -152,9 +152,14 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
     }
 
     public class BinarySearchTreeIterator implements Iterator<T> {
-
+        private List<Node> next;
         private BinarySearchTreeIterator() {
-            int currentIndex = 0;
+            next = new ArrayList<Node>();
+            Node node = root;
+            while (node != null) {
+                next.add(node);
+                node = node.left;
+            }
             // Добавьте сюда инициализацию, если она необходима.
         }
 
@@ -170,8 +175,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
          */
         @Override
         public boolean hasNext() {
-            //return
-            throw new NotImplementedError();
+            return !next.isEmpty();
         }
 
         /**
@@ -189,8 +193,19 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
          */
         @Override
         public T next() {
-            // TODO
-            throw new NotImplementedError();
+            if (!hasNext()) throw new IllegalStateException();
+            int lastIndex = next.size() - 1;
+            Node nodes = next.get(lastIndex);
+            next.remove(lastIndex);
+            Node<T> answer = nodes;
+            if (nodes.right != null) {
+                nodes = nodes.right;
+                while (nodes != null) {
+                    next.add(nodes);
+                    nodes = nodes.left;
+                }
+            }
+            return answer.value;
         }
 
         /**
