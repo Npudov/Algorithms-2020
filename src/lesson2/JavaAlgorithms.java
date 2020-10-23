@@ -133,44 +133,6 @@ public class JavaAlgorithms {
         }
         return first.substring((maxIndex - 1) - maxSubstringLength + 1, (maxIndex - 1) + 1);
     }
-        /*if (first == null || second == null || first.length() == 0 || second.length() == 0) return "";
-        if (first.equals(second)) return first;
-        char[] x = first.toCharArray();
-        char[] y = second.toCharArray();
-        List<Character> maxSubstring = new ArrayList<>();
-        int[][] matrix = new int[first.length() + 1][second.length() + 1];
-        for (int indexFirst = 0; indexFirst < first.length(); indexFirst++) {
-            for (int indexSecond = 0; indexSecond < second.length(); indexSecond++) {
-                if (x[indexFirst] == y[indexSecond]) {
-                    matrix[indexFirst + 1][indexSecond + 1] = matrix[indexFirst][indexSecond] + 1;
-                }
-                else {
-                    matrix[indexFirst + 1][indexSecond + 1] = max(matrix[indexFirst][indexSecond + 1], matrix[indexFirst + 1][indexSecond]);
-                }
-            }
-        }
-        int indexX = first.length() - 1;
-        int indexY = second.length() - 1;
-        while (indexX >= 0 && indexY >= 0) {
-            if (x[indexX] == y[indexY]) {
-                maxSubstring.add(x[indexX]);
-                indexX--;
-                indexY--;
-            }
-            else if (matrix[indexX][indexY + 1] > matrix[indexX + 1][indexY]) {
-                indexX--;
-            }
-            else {
-                indexY--;
-            }
-        }
-        StringBuilder result = new StringBuilder();
-        if (maxSubstring.isEmpty()) return "";
-        for (int i = maxSubstring.size() - 1; i >= 0; i--) {
-            result.append(maxSubstring.get(i));
-        }
-        return result.toString();
-    }*/
 
     /**
      * Число простых чисел в интервале

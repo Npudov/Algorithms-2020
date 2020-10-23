@@ -99,6 +99,10 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
      *
      * Средняя
      */
+    /*
+    время: O(logN)
+    память: O(logN)
+     */
     @Override
     public boolean remove(Object o) {
         if (!contains(o)) return false; // если элемента нет в множестве
@@ -108,7 +112,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
         return true;
     }
 
-    private Node<T> delete(Node<T> start, T value) {
+    private Node<T> delete(Node<T> start, T value) { // Используем метод рекурсивного удаления
         if (start == null) return null;
         int comparison = value.compareTo(start.value);
         if (comparison == 0) {
@@ -151,7 +155,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
         return new BinarySearchTreeIterator();
     }
 
-    public class BinarySearchTreeIterator implements Iterator<T> {
+    public class BinarySearchTreeIterator implements Iterator<T> { // Используем in-order обход
         private List<Node> next;
         private BinarySearchTreeIterator() {
             next = new ArrayList<Node>();
@@ -173,6 +177,10 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
          *
          * Средняя
          */
+        /*
+        время: O(1)
+        память: O(1)
+         */
         @Override
         public boolean hasNext() {
             return !next.isEmpty();
@@ -190,6 +198,10 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
          * Спецификация: {@link Iterator#next()} (Ctrl+Click по next)
          *
          * Средняя
+         */
+        /*
+        время: O(N)
+        память: O(N)
          */
         @Override
         public T next() {

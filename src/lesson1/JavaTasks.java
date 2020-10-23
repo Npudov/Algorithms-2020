@@ -50,30 +50,29 @@ public class JavaTasks {
         DateTimeFormatter formatter24 = DateTimeFormatter.ofPattern("HH:mm:ss"); // 24-hours format
         File fileRead = new File(inputName);
         File fileWrite = new File(outputName);
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(fileRead));
-        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileWrite));
-        while (bufferedReader.ready()) {
-            String str = bufferedReader.readLine();
-            String time = formatter24.format(formatter12.parse(str));
-            String[] hours24Time = time.split(":");
-            int seconds = Integer.parseInt(hours24Time[0]) * 3600 + Integer.parseInt(hours24Time[1]) * 60 + Integer.parseInt(hours24Time[2]);
-            listTime.add(seconds);
-        }
-        Collections.sort(listTime);
-        for (int i = 0; i < listTime.size(); i++) {
-            int element = listTime.get(i);
-            int hours = element / 3600;
-            int minutes = (element - hours * 3600) / 60;
-            int sec = element - hours * 3600 - minutes * 60;
-            String format24hours = String.format("%02d:%02d:%02d", hours, minutes, sec);
-            String answer = formatter12.format(formatter24.parse(format24hours));
-            bufferedWriter.write(answer);
-            if (i != listTime.size() - 1) {
-                bufferedWriter.newLine();
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(fileRead));
+             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileWrite))) {
+            while (bufferedReader.ready()) {
+                String str = bufferedReader.readLine();
+                String time = formatter24.format(formatter12.parse(str));
+                String[] hours24Time = time.split(":");
+                int seconds = Integer.parseInt(hours24Time[0]) * 3600 + Integer.parseInt(hours24Time[1]) * 60 + Integer.parseInt(hours24Time[2]);
+                listTime.add(seconds);
+            }
+            Collections.sort(listTime);
+            for (int i = 0; i < listTime.size(); i++) {
+                int element = listTime.get(i);
+                int hours = element / 3600;
+                int minutes = (element - hours * 3600) / 60;
+                int sec = element - hours * 3600 - minutes * 60;
+                String format24hours = String.format("%02d:%02d:%02d", hours, minutes, sec);
+                String answer = formatter12.format(formatter24.parse(format24hours));
+                bufferedWriter.write(answer);
+                if (i != listTime.size() - 1) {
+                    bufferedWriter.newLine();
+                }
             }
         }
-        bufferedWriter.flush();
-        bufferedWriter.close();
     }
 
     /**
@@ -147,25 +146,24 @@ public class JavaTasks {
         int cnt = 0; // количество элементов(температур) в файле
         File fileRead = new File(inputName);
         File fileWrite = new File(outputName);
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(fileRead));
-        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileWrite));
-        while (bufferedReader.ready()) {
-            cnt++;
-            String str = bufferedReader.readLine();
-            int temperature = (int) Math.floor((Float.parseFloat(str) * 10));
-            countArray[temperature + delta]++;
-        }
-        int curIndex = 0;
-        for (int i = 0; i < countArray.length; i++) {
-            int cntTemperature = countArray[i];
-            if (cntTemperature == 0) continue;
-            for (int j = 0; j < cntTemperature; j++) {
-                bufferedWriter.write((i - delta) / 10.0 + "\n");
-                curIndex++;
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(fileRead));
+             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileWrite))) {
+            while (bufferedReader.ready()) {
+                cnt++;
+                String str = bufferedReader.readLine();
+                int temperature = (int) Math.floor((Float.parseFloat(str) * 10));
+                countArray[temperature + delta]++;
+            }
+            int curIndex = 0;
+            for (int i = 0; i < countArray.length; i++) {
+                int cntTemperature = countArray[i];
+                if (cntTemperature == 0) continue;
+                for (int j = 0; j < cntTemperature; j++) {
+                    bufferedWriter.write((i - delta) / 10.0 + "\n");
+                    curIndex++;
+                }
             }
         }
-        bufferedWriter.flush();
-        bufferedWriter.close();
     }
 
     /**
@@ -202,60 +200,37 @@ public class JavaTasks {
     память: S(N)
     */
     static public void sortSequence(String inputName, String outputName) throws IOException {
-        int cnt = 1;
-        int maxCount  = -1;
         int minNumber = 0;
+        int maxCount = 0;
         List<Integer> list = new ArrayList<>(); //исходный массив последовательности
-        List<Integer> sortList = new ArrayList<>(); //отсортированный массив последовательности
-        List<Integer> minDigit = new ArrayList<>();
+        Map<Integer, Integer> map = new HashMap<>();
         File fileRead = new File(inputName);
         File fileWrite = new File(outputName);
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(fileRead));
-        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileWrite));
-        while (bufferedReader.ready()) {
-            int number = Integer.parseInt(bufferedReader.readLine());
-            list.add(number);
-            sortList.add(number);
-        }
-        Collections.sort(sortList);
-        for (int i = 0; i < sortList.size() - 1; i++) {
-            int curElement = sortList.get(i);
-            int nextElement = sortList.get(i + 1);
-            if (curElement != nextElement) {
-                maxCount = getMaxCount(cnt, maxCount, minDigit, curElement);
-                cnt = 1;
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(fileRead));
+             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileWrite))) {
+            while (bufferedReader.ready()) {
+                Integer number = Integer.parseInt(bufferedReader.readLine());
+                list.add(number);
+                map.put(number, map.getOrDefault(number, 0) + 1);
             }
-            else {
-                if ((i == sortList.size() - 2) && (curElement == nextElement)) {
-                    maxCount = getMaxCount(cnt, maxCount, minDigit, curElement);
+            for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+                if (entry.getValue() > maxCount) {
+                    minNumber = entry.getKey();
+                    maxCount = entry.getValue();
                 }
-                cnt++;
+                if (entry.getValue() == maxCount && entry.getKey() < minNumber) {
+                    minNumber = entry.getKey();
+                }
+            }
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i) != minNumber) {
+                    bufferedWriter.write(list.get(i) + "\n");
+                }
+            }
+            for (int i = 0; i < maxCount; i++) {
+                bufferedWriter.write(minNumber + "\n");
             }
         }
-        Collections.sort(minDigit);
-        minNumber = minDigit.get(0);
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i) != minNumber) {
-                bufferedWriter.write(list.get(i) + "\n");
-            }
-        }
-        for (int i = 0; i < maxCount; i++) {
-            bufferedWriter.write(minNumber + "\n");
-        }
-        bufferedWriter.flush();
-        bufferedWriter.close();
-    }
-
-    private static int getMaxCount(int cnt, int maxCount, List<Integer> minDigit, int curElement) {
-        if (cnt > maxCount) {
-            maxCount = cnt;
-            minDigit.clear();
-            minDigit.add(curElement);
-        }
-        if (cnt == maxCount) {
-            minDigit.add(curElement);
-        }
-        return maxCount;
     }
 
     /**
