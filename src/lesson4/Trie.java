@@ -84,16 +84,57 @@ public class Trie extends AbstractSet<String> implements Set<String> {
 
     /**
      * Итератор для префиксного дерева
-     *
+     * <p>
      * Спецификация: {@link Iterator} (Ctrl+Click по Iterator)
-     *
+     * <p>
      * Сложная
      */
     @NotNull
     @Override
     public Iterator<String> iterator() {
-        // TODO
-        throw new NotImplementedError();
+        return new TrieIterator();
     }
 
+    public class TrieIterator implements Iterator<String> {
+
+        List<String> words = new ArrayList<String>();
+        Integer curIndex = 0;
+        String removeWord = "";
+
+        private TrieIterator() {
+            if (root == null) return;
+
+            addWords(root, "");
+        }
+
+        private void addWords(Node node, String str) {
+            if (node.children == null) return;
+            for (Map.Entry<Character, Node> entry : node.children.entrySet()) {
+                if (entry.getKey() == (char) 0) {
+                    words.add(str);
+                }
+                addWords(entry.getValue(), str + entry.getKey());
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            return curIndex < words.size();
+        }
+
+        @Override
+        public String next() {
+            if (!hasNext()) throw new IllegalStateException();
+            removeWord = words.get(curIndex);
+            curIndex++;
+            return removeWord;
+        }
+
+        @Override
+        public void remove() {
+            if (removeWord == "") throw new IllegalStateException();
+            Trie.this.remove(removeWord);
+            removeWord = "";
+        }
+    }
 }
