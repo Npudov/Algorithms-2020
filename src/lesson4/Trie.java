@@ -95,7 +95,7 @@ public class Trie extends AbstractSet<String> implements Set<String> {
         return new TrieIterator();
     }
 
-    public class TrieIterator implements Iterator<String> {
+    private class TrieIterator implements Iterator<String> {
 
         List<String> words = new ArrayList<String>();
         Integer curIndex = 0;

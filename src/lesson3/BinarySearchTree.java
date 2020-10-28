@@ -157,6 +157,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
 
     public class BinarySearchTreeIterator implements Iterator<T> { // Используем in-order обход
         private List<Node> next;
+        private Node<T> removeNode = null;
         private BinarySearchTreeIterator() {
             next = new ArrayList<Node>();
             Node node = root;
@@ -209,7 +210,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
             int lastIndex = next.size() - 1;
             Node nodes = next.get(lastIndex);
             next.remove(lastIndex);
-            Node<T> answer = nodes;
+            removeNode = nodes;
             if (nodes.right != null) {
                 nodes = nodes.right;
                 while (nodes != null) {
@@ -217,7 +218,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
                     nodes = nodes.left;
                 }
             }
-            return answer.value;
+            return removeNode.value;
         }
 
         /**
@@ -232,10 +233,15 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
          *
          * Сложная
          */
+        /*
+        время: O(logN)
+        память: O(logN)
+         */
         @Override
         public void remove() {
-            // TODO
-            throw new NotImplementedError();
+            if (removeNode == null) throw new IllegalStateException();
+            BinarySearchTree.this.remove(removeNode.value);
+            removeNode = null;
         }
     }
 
