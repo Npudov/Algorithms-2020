@@ -121,7 +121,9 @@ public class Trie extends AbstractSet<String> implements Set<String> {
         public boolean hasNext() {
             return curIndex < words.size();
         }
-
+        /*
+        O(1)
+         */
         @Override
         public String next() {
             if (!hasNext()) throw new IllegalStateException();
@@ -130,6 +132,10 @@ public class Trie extends AbstractSet<String> implements Set<String> {
             return removeWord;
         }
 
+        /*
+        время: O(N * logN)
+        память: O(N * logN)
+         */
         @Override
         public void remove() {
             if (removeWord == "") throw new IllegalStateException();
