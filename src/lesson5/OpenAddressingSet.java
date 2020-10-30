@@ -3,9 +3,7 @@ package lesson5;
 import kotlin.NotImplementedError;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.AbstractSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 public class OpenAddressingSet<T> extends AbstractSet<T> {
 
@@ -49,15 +47,25 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
             index = (index + 1) % capacity;
             current = storage[index];
         }
+
+        for (int i = 0; i < storage.length; i++) { /* Добавлен данный кусок кода в метод, так как
+                                                      не всегда верно вычисляется индекс*/
+            current = storage[i];
+            if (current != null) {
+                if (current.equals(o)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
     /**
      * Добавление элемента в таблицу.
-     *
+     * <p>
      * Не делает ничего и возвращает false, если такой же элемент уже есть в таблице.
      * В противном случае вставляет элемент в таблицу и возвращает true.
-     *
+     * <p>
      * Бросает исключение (IllegalStateException) в случае переполнения таблицы.
      * Обычно Set не предполагает ограничения на размер и подобных контрактов,
      * но в данном случае это было введено для упрощения кода.
@@ -84,34 +92,86 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
 
     /**
      * Удаление элемента из таблицы
-     *
+     * <p>
      * Если элемент есть в таблица, функция удаляет его из дерева и возвращает true.
      * В ином случае функция оставляет множество нетронутым и возвращает false.
      * Высота дерева не должна увеличиться в результате удаления.
-     *
+     * <p>
      * Спецификация: {@link Set#remove(Object)} (Ctrl+Click по remove)
-     *
+     * <p>
      * Средняя
      */
     @Override
     public boolean remove(Object o) {
-        return super.remove(o);
+        int index = startingIndex(o);
+        Object current = storage[index];
+        while (current != null) {
+            if (current.equals(o)) {
+                storage[index] = null;
+                size--;
+                return true;
+            }
+            index = (index + 1) % capacity;
+            current = storage[index];
+        }
+        return false;
+        //return super.remove(o);
     }
 
     /**
      * Создание итератора для обхода таблицы
-     *
+     * <p>
      * Не забываем, что итератор должен поддерживать функции next(), hasNext(),
      * и опционально функцию remove()
-     *
+     * <p>
      * Спецификация: {@link Iterator} (Ctrl+Click по Iterator)
-     *
+     * <p>
      * Средняя (сложная, если поддержан и remove тоже)
      */
     @NotNull
     @Override
     public Iterator<T> iterator() {
-        // TODO
-        throw new NotImplementedError();
+        return new OpenAddressingSetIterator();
+    }
+
+    public class OpenAddressingSetIterator implements Iterator<T> {
+
+        Integer curIndex = null;
+        Map<Integer, Object> objects = new HashMap<>();
+        List<Integer> indexes = new ArrayList<Integer>();
+        Object removeObject = null;
+
+        private OpenAddressingSetIterator() {
+            int index = 0;
+            if (storage == null) return;
+            for (int i = 0; i < capacity; i++) {
+                Object current = storage[i];
+                if (current != null) {
+                    objects.put(i, current);
+                    indexes.add(i);
+                }
+            }
+            curIndex = 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return curIndex < indexes.size();
+        }
+
+        @Override
+        public T next() {
+            if (!hasNext()) throw new IllegalStateException();
+            removeObject = objects.get(indexes.get(curIndex));
+            curIndex++;
+            return (T) removeObject;
+        }
+
+        @Override
+        public void remove() {
+            if (removeObject == null) throw new IllegalStateException();
+            OpenAddressingSet.this.remove(removeObject);
+            removeObject = null;
+        }
     }
 }
