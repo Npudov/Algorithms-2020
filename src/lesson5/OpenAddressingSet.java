@@ -101,6 +101,7 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
      * <p>
      * Средняя
      */
+    // O(1)
     @Override
     public boolean remove(Object o) {
         int index = startingIndex(o);
@@ -154,11 +155,13 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
             curIndex = 0;
         }
 
+        // O(1)
         @Override
         public boolean hasNext() {
             return curIndex < indexes.size();
         }
 
+        // O(1)
         @Override
         public T next() {
             if (!hasNext()) throw new IllegalStateException();
@@ -167,6 +170,7 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
             return (T) removeObject;
         }
 
+        // O(1)
         @Override
         public void remove() {
             if (removeObject == null) throw new IllegalStateException();
