@@ -103,19 +103,26 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
     время: O(logN)
     память: O(logN)
      */
+    private boolean removingElement; //данная переменная теперь является полем класса
     @Override
     public boolean remove(Object o) {
-        if (!contains(o)) return false; // если элемента нет в множестве
         T t = (T) o;
+        removingElement = false;
         root = delete(root, t);
-        size--;
-        return true;
+        if (removingElement) {
+            size--;
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     private Node<T> delete(Node<T> start, T value) { // Используем метод рекурсивного удаления
         if (start == null) return null;
         int comparison = value.compareTo(start.value);
         if (comparison == 0) {
+            removingElement = true;
             if (start.left == null && start.right == null) return null; // у узла нет дочерних элементов
 
             if (start.left == null) return start.right; // у узла один дочерний элемент
@@ -201,8 +208,8 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
          * Средняя
          */
         /*
-        время: O(N)
-        память: O(N)
+        время: O(logN)
+        память: O(logN)
          */
         @Override
         public T next() {
