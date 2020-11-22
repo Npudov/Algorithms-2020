@@ -2,7 +2,13 @@ package lesson7;
 
 import kotlin.NotImplementedError;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 @SuppressWarnings("unused")
 public class JavaDynamicTasks {
@@ -18,8 +24,48 @@ public class JavaDynamicTasks {
      * Если есть несколько самых длинных общих подпоследовательностей, вернуть любую из них.
      * При сравнении подстрок, регистр символов *имеет* значение.
      */
+    /* Алгоритм Нидлмана-Вунша
+    время: O(len(first)*len(second))
+    память: O(len(first) * len(second))
+     */
     public static String longestCommonSubSequence(String first, String second) {
-        throw new NotImplementedError();
+        if (first == null || second == null || first.length() == 0 || second.length() == 0) return "";
+        if (first.equals(second)) return first;
+        char[] x = first.toCharArray();
+        char[] y = second.toCharArray();
+        List<Character> maxSubstring = new ArrayList<>();
+        int[][] matrix = new int[first.length() + 1][second.length() + 1];
+        for (int indexFirst = 0; indexFirst < first.length(); indexFirst++) {
+            for (int indexSecond = 0; indexSecond < second.length(); indexSecond++) {
+                if (x[indexFirst] == y[indexSecond]) {
+                    matrix[indexFirst + 1][indexSecond + 1] = matrix[indexFirst][indexSecond] + 1;
+                }
+                else {
+                    matrix[indexFirst + 1][indexSecond + 1] = max(matrix[indexFirst][indexSecond + 1], matrix[indexFirst + 1][indexSecond]);
+                }
+            }
+        }
+        int indexX = first.length() - 1;
+        int indexY = second.length() - 1;
+        while (indexX >= 0 && indexY >= 0) {
+            if (x[indexX] == y[indexY]) {
+                maxSubstring.add(x[indexX]);
+                indexX--;
+                indexY--;
+            }
+            else if (matrix[indexX][indexY + 1] > matrix[indexX + 1][indexY]) {
+                indexX--;
+            }
+            else {
+                indexY--;
+            }
+        }
+        StringBuilder result = new StringBuilder();
+        if (maxSubstring.isEmpty()) return "";
+        for (int i = maxSubstring.size() - 1; i >= 0; i--) {
+            result.append(maxSubstring.get(i));
+        }
+        return result.toString();
     }
 
     /**
@@ -34,9 +80,40 @@ public class JavaDynamicTasks {
      * то вернуть ту, в которой числа расположены раньше (приоритет имеют первые числа).
      * В примере ответами являются 2, 8, 9, 12 или 2, 5, 9, 12 -- выбираем первую из них.
      */
-    public static List<Integer> longestIncreasingSubSequence(List<Integer> list) {
-        throw new NotImplementedError();
-    }
+    /*public static List<Integer> longestIncreasingSubSequence(List<Integer> list) {
+        int n = list.size();
+        Integer[] d = new Integer[n];
+        Integer[] prev = new Integer[n]; // хранит индекс предыдущего элемента возрастающей подпоследовательности
+       for (int i = 0; i < n; i++) {
+           d[i] = 1;
+           prev[i] = -1;
+           for (int j = 1; j < i - 1; j++) {
+               if (list.get(j) < list.get(i) && d[j] + 1 > d[i]) {
+                   d[i] = d[j + 1];
+                   prev[i] = j;
+               }
+           }
+       }
+       int answer = 0;
+       for (int i = 0; i < n; i++) {
+           answer = max(answer, d[i]);
+       }
+       // восстановление ответа
+       Integer[] l = new Integer[answer];
+       int k = 1;
+       for (int i = 1; i < n; i++) {
+           if (d[i] > d[k]) {
+               k = i; // индекс, в котором реализуется максимум в массиве d
+           }
+       }
+       int j = answer;
+       while (k > 0) {
+           l[j] = k;
+           j--;
+           k = prev[k];
+       }
+       return Arrays.asList(l);
+    }*/
 
     /**
      * Самый короткий маршрут на прямоугольном поле.
@@ -58,8 +135,43 @@ public class JavaDynamicTasks {
      *
      * Здесь ответ 2 + 3 + 4 + 1 + 2 = 12
      */
-    public static int shortestPathOnField(String inputName) {
-        throw new NotImplementedError();
+    public static int shortestPathOnField(String inputName) throws IOException {
+        List<String> list = new ArrayList<>();
+        File fileRead = new File(inputName);
+        try(BufferedReader bufferedReader = new BufferedReader(new FileReader(fileRead))) {
+            while (bufferedReader.ready()) {
+                String str = bufferedReader.readLine();
+                list.add(str);
+            }
+        }
+        Integer lines = list.size();
+        Integer columns = list.get(0).split(" ").length;
+        Integer[][] inputArray = new Integer[lines][columns];
+        Integer[][] weight = new Integer[lines][columns];
+        for (int i = 0; i < lines; i++) {
+            String[] string = list.get(i).split(" ");
+            for (int j = 0; j < columns; j++) {
+                inputArray[i][j] = Integer.parseInt(string[j]);
+            }
+        }
+
+        for (int i = 0; i < lines; i++) {
+            for (int j = 0; j < columns; j++) {
+                if (i == 0 && j == 0) {
+                    weight[i][j] = 0;
+                }
+                else if (j == 0) {
+                    weight[i][j] = weight[i - 1][j] + inputArray[i][j]; //можем придти только сверху-вниз
+                }
+                else if (i == 0) {
+                    weight[i][j] = weight[i][j - 1] + inputArray[i][j]; // можем придти только слева направо
+                }
+                else {
+                    weight[i][j] = min(weight[i - 1][j], min(weight[i][j - 1], weight[i - 1][j - 1])) + inputArray[i][j];
+                }
+            }
+        }
+        return weight[lines - 1][columns - 1];
     }
 
     // Задачу "Максимальное независимое множество вершин в графе без циклов"

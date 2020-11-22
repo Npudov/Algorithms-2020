@@ -1,12 +1,14 @@
 package lesson5;
 
-import kotlin.NotImplementedError;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 public class OpenAddressingSet<T> extends AbstractSet<T> {
 
+    enum ISDELETE {
+        DEL
+    }
     private final int bits;
 
     private final int capacity;
@@ -47,16 +49,6 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
             index = (index + 1) % capacity;
             current = storage[index];
         }
-
-        for (int i = 0; i < storage.length; i++) { /* Добавлен данный кусок кода в метод, так как
-                                                      не всегда верно вычисляется индекс*/
-            current = storage[i];
-            if (current != null) {
-                if (current.equals(o)) {
-                    return true;
-                }
-            }
-        }
         return false;
     }
 
@@ -75,7 +67,7 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
         int startingIndex = startingIndex(t);
         int index = startingIndex;
         Object current = storage[index];
-        while (current != null) {
+        while (current != null && current != ISDELETE.DEL) {
             if (current.equals(t)) {
                 return false;
             }
@@ -108,7 +100,7 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
         Object current = storage[index];
         while (current != null) {
             if (current.equals(o)) {
-                storage[index] = null;
+                storage[index] = ISDELETE.DEL;
                 size--;
                 return true;
             }
@@ -116,7 +108,6 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
             current = storage[index];
         }
         return false;
-        //return super.remove(o);
     }
 
     /**
@@ -137,36 +128,27 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
 
     public class OpenAddressingSetIterator implements Iterator<T> {
 
-        Integer curIndex = null;
-        Map<Integer, Object> objects = new HashMap<>();
-        List<Integer> indexes = new ArrayList<Integer>();
+        Integer curIndex = 0;
+        Integer cntElements = size();
+        Integer cntFoundElements = 0;
         Object removeObject = null;
-
-        private OpenAddressingSetIterator() {
-            int index = 0;
-            if (storage == null) return;
-            for (int i = 0; i < capacity; i++) {
-                Object current = storage[i];
-                if (current != null) {
-                    objects.put(i, current);
-                    indexes.add(i);
-                }
-            }
-            curIndex = 0;
-        }
 
         // O(1)
         @Override
         public boolean hasNext() {
-            return curIndex < indexes.size();
+            return cntFoundElements < cntElements;
         }
 
         // O(1)
         @Override
         public T next() {
             if (!hasNext()) throw new IllegalStateException();
-            removeObject = objects.get(indexes.get(curIndex));
-            curIndex++;
+            removeObject = null;
+            while (removeObject == null || removeObject == ISDELETE.DEL) {
+                removeObject = storage[curIndex];
+                curIndex++;
+            }
+            cntFoundElements++;
             return (T) removeObject;
         }
 
@@ -174,7 +156,8 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
         @Override
         public void remove() {
             if (removeObject == null) throw new IllegalStateException();
-            OpenAddressingSet.this.remove(removeObject);
+            storage[curIndex - 1] = ISDELETE.DEL;
+            size--;
             removeObject = null;
         }
     }
