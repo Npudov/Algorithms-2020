@@ -80,40 +80,9 @@ public class JavaDynamicTasks {
      * то вернуть ту, в которой числа расположены раньше (приоритет имеют первые числа).
      * В примере ответами являются 2, 8, 9, 12 или 2, 5, 9, 12 -- выбираем первую из них.
      */
-    /*public static List<Integer> longestIncreasingSubSequence(List<Integer> list) {
-        int n = list.size();
-        Integer[] d = new Integer[n];
-        Integer[] prev = new Integer[n]; // хранит индекс предыдущего элемента возрастающей подпоследовательности
-       for (int i = 0; i < n; i++) {
-           d[i] = 1;
-           prev[i] = -1;
-           for (int j = 1; j < i - 1; j++) {
-               if (list.get(j) < list.get(i) && d[j] + 1 > d[i]) {
-                   d[i] = d[j + 1];
-                   prev[i] = j;
-               }
-           }
-       }
-       int answer = 0;
-       for (int i = 0; i < n; i++) {
-           answer = max(answer, d[i]);
-       }
-       // восстановление ответа
-       Integer[] l = new Integer[answer];
-       int k = 1;
-       for (int i = 1; i < n; i++) {
-           if (d[i] > d[k]) {
-               k = i; // индекс, в котором реализуется максимум в массиве d
-           }
-       }
-       int j = answer;
-       while (k > 0) {
-           l[j] = k;
-           j--;
-           k = prev[k];
-       }
-       return Arrays.asList(l);
-    }*/
+    public static List<Integer> longestIncreasingSubSequence(List<Integer> list) {
+        throw new NotImplementedError();
+    }
 
     /**
      * Самый короткий маршрут на прямоугольном поле.
@@ -134,6 +103,10 @@ public class JavaDynamicTasks {
      * Необходимо найти маршрут с минимальным весом и вернуть этот минимальный вес.
      *
      * Здесь ответ 2 + 3 + 4 + 1 + 2 = 12
+     */
+    /*
+    время: O(n * m)
+    память: O(n*m)
      */
     public static int shortestPathOnField(String inputName) throws IOException {
         List<String> list = new ArrayList<>();
