@@ -12,6 +12,7 @@ public class Trie extends AbstractSet<String> implements Set<String> {
 
     private static class Node {
         Map<Character, Node> children = new LinkedHashMap<>();
+        Node parent = null;
     }
 
     private Node root = new Node();
@@ -61,6 +62,8 @@ public class Trie extends AbstractSet<String> implements Set<String> {
                 modified = true;
                 Node newChild = new Node();
                 current.children.put(character, newChild);
+                //сохраняем родителя
+                newChild.parent = current;
                 current = newChild;
             }
         }
@@ -95,23 +98,27 @@ public class Trie extends AbstractSet<String> implements Set<String> {
         return new TrieIterator();
     }
 
-    private class TrieIterator implements Iterator<String> {
+    public class TrieIterator implements Iterator<String> {
+    List<String> words = new ArrayList<String>();
+    List<Node> nodes = new ArrayList<Node>();
+    Integer curIndex = 0;
+    Integer removeIndex = -1;
+    String removeWord = "";
+    private TrieIterator() {
+        if (root == null) return;
 
-        List<String> words = new ArrayList<String>();
-        Integer curIndex = 0;
-        String removeWord = "";
+        if (size == 0) return;
 
-        private TrieIterator() {
-            if (root == null) return;
 
-            addWords(root, "");
-        }
+        addWords(root, "");
+    }
 
         private void addWords(Node node, String str) {
             if (node.children == null) return;
             for (Map.Entry<Character, Node> entry : node.children.entrySet()) {
                 if (entry.getKey() == (char) 0) {
                     words.add(str);
+                    nodes.add(entry.getValue().parent);
                 }
                 addWords(entry.getValue(), str + entry.getKey());
             }
@@ -128,6 +135,7 @@ public class Trie extends AbstractSet<String> implements Set<String> {
         public String next() {
             if (!hasNext()) throw new IllegalStateException();
             removeWord = words.get(curIndex);
+            removeIndex = curIndex;
             curIndex++;
             return removeWord;
         }
@@ -139,8 +147,12 @@ public class Trie extends AbstractSet<String> implements Set<String> {
         @Override
         public void remove() {
             if (removeWord == "") throw new IllegalStateException();
-            Trie.this.remove(removeWord);
+            if (nodes.get(removeIndex).children.remove((char) 0) != null) {
+                size--;
+            }
+            nodes.remove(removeIndex);
             removeWord = "";
+            removeIndex = -1;
         }
     }
 }
